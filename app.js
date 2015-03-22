@@ -1,6 +1,7 @@
 var express = require('express');
 var sentiment = require('sentiment');
-var http = require('http');
+var http = require('follow-redirects').http;
+var request = require('request');
 var path = require('path');
 var cheerio = require('cheerio');
 var favicon = require('serve-favicon');
@@ -87,13 +88,37 @@ app.get('/sentiment/:apiPath', function(req, res) {
 
 		apiRes.on('end', function() {
 		    var obj = JSON.parse(output);
-		    extractContent(0, obj);
+		    extractContent(0, obj, []);
 		});
 	} );
 	
 	// Extract content of articles
-	var articles = [];
-	var extractContent = function(i, obj) {
+	//var articles = [];
+	var extractContent = function(i, obj, articles) {
+	
+	request({method: 'GET', uri: obj.results[i].url, jar: true}, function (error, response, body) {
+		if (!error && response.statusCode == 200) {
+			var str = body;    
+			var $ = cheerio.load(str);
+			$('p').append(' ');
+			articles[i] = $('p').text();
+			
+			console.log('GET '+obj.results[i].url);
+			
+			//if(i==0) res.end(articles[0]);
+			//var dummy = document.createElement('div');
+			//dummy.innerHTML = str;
+			//var paragraphs = dummy.getElementsByTagName('p');
+			//articles[i] = "";
+			//for(var p in paragraphs) articles[i]+=p.innerHTML+' ';
+			
+			if(i == obj.results.length-1) rankBySentiment(obj, articles);
+			//else if(articleRes.statusCode == 303) extractContent(i, obj);
+			else extractContent(i+1, obj, articles);
+		}
+	})
+	
+/*
 		var articleReq = http.request({
 			hostname: 'www.nytimes.com',
 		 	path: obj.results[i].url.split('.com')[1],
@@ -129,6 +154,9 @@ app.get('/sentiment/:apiPath', function(req, res) {
 			});
 		 });
 		 articleReq.end();
+		 
+		 
+*/
 	};
 	
 	// Useful function to sort an array according to a key in its objects
@@ -140,22 +168,30 @@ app.get('/sentiment/:apiPath', function(req, res) {
 	}
 	
 	// Rank a list of articles according to the sentiment analysis
-	var rankBySentiment = function(articles) {
-		var rankedArticles = [];
-		var result = "<table><tr><td>Popularity rank</td><td>Sentiment rank</td></tr>";
+	var rankBySentiment = function(obj, articles) {
+		var ranked = [];
+		var table = "<table border=1><tr><td>Popularity rank</td><td>Sentiment rank</td><td>Article URL</td></tr>";
 		for(var i in articles){
 			sentiment(articles[i], function (err, result) {
+			
+				console.log('P = '+i+', S = '+result.score);
 				articles[i]={
 					text:articles[i],
 					popularityRank:i,
 					sentimentRank:result.score
 				};
-				result += "<tr><td>"+i+"</td><td>"+result.score+"</td></tr>";
+				
+			
+				//table += "<tr><td>"+i+"</td><td>"+result.score+"</td><td>"+obj.results[i].url+"</td></tr>";
+				
+				if(i ==	articles.length-1){
+					ranked = sortByKey(articles, 'sentimentRank');
+					for(var a in ranked) table+= "<tr><td>"+ranked[a].popularityRank+"</td><td>"+a+"</td><td>"+obj.results[ranked[a].popularityRank].url+"</td></tr>";
+					table += "</table>";
+					res.send(table);
+				}
 			});
 		}
-		//rankedArticles = sortByKey(articles, 'score');
-		result += "</table>";
-		res.end(result);
 	};
 	
 	apiReq.end();
