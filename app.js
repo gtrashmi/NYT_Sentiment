@@ -8,6 +8,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var alchemyApi = require('alchemy-api');
+var alchemy = new alchemyApi('b57c92ce1fc89990843684e3ef445cba23c89b33');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -198,6 +200,36 @@ app.get('/sentiment/:apiPath', function(req, res) {
 });
 
 
+app.get('/alchemysentiment/', function(req, res) {
+
+	// GET most viewed articles in JSON format from NYT API
+	request({method: 'GET', uri: 'http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/1?api-key=316c0ea67fc13baeaa824914ebf812f5:16:71413601', jar: true}, function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				console.log('Request was good');
+				var obj = JSON.parse(body);
+				extractUrl(2,obj);
+			}
+			else
+			{
+				console.log('Bad request');
+				console.log(response.statusCode)
+			}
+		});
+	var extractUrl = function(i,obj){
+	
+		console.log('We are in the sentiment function');
+		console.log(obj.results[i].url);
+		alchemy.sentiment('html',obj.results[i].url,function(err,response){
+			if(err) {
+				throw err;
+			}
+			console.log('Good Request');
+			console.log("Sentiment: " + response["docSentiment"]["type"]);
+			res.end("Sentiment: " + response["docSentiment"]["type"] + " \nScore: " + response["docSentiment"]["score"]);
+		});
+	};
+	
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
