@@ -207,7 +207,9 @@ app.get('/alchemysentiment/', function(req, res) {
 			if (!error && response.statusCode == 200) {
 				console.log('Request was good');
 				var obj = JSON.parse(body);
-				extractUrl(2,obj);
+				//extractUrl(0,obj);
+				//webExtractText(0,obj);
+				webKeywordSentiment(0,obj);
 			}
 			else
 			{
@@ -227,6 +229,46 @@ app.get('/alchemysentiment/', function(req, res) {
 			console.log("Sentiment: " + response["docSentiment"]["type"]);
 			res.end("Sentiment: " + response["docSentiment"]["type"] + " \nScore: " + response["docSentiment"]["score"]);
 		});
+	};
+	
+	var webExtractText = function(i,obj){
+		console.log('We are in the sentiment function');
+		
+		request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetTextSentiment?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&url=' + obj.results[i].url, jar: true}, function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				console.log('Request was good');
+			/*	var temp = JSON.parse(body);
+				var feeling =JSON.
+				console.log(feeling);*/
+				res.end(body);
+			}
+			else
+			{
+				console.log('Bad request');
+				console.log(response.statusCode)
+			}
+		});
+		
+	};
+	
+	var webKeywordSentiment = function(i,obj){
+		console.log('We are in the sentiment function');
+		
+		request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&keywordExtractMode=strict&sentiment=1&url=' + obj.results[i].url, jar: true}, function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				console.log('Request was good');
+			/*	var temp = JSON.parse(body);
+				var feeling =JSON.
+				console.log(feeling);*/
+				res.end(body);
+			}
+			else
+			{
+				console.log('Bad request');
+				console.log(response.statusCode)
+			}
+		});
+		
 	};
 	
 });
