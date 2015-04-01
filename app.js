@@ -256,7 +256,7 @@ app.get('/alchemysentiment/', function(req, res) {
 				
 				
 				
-				if(i == obj.results.length - 1){
+				if(articles2.length == obj.results.length){
 				  var ranked = [];
       		var table = "<table border=1><tr><td>Popularity rank</td><td>Alchemy rank</td><td>Alchemy score</td><td>Article URL</td></tr>";
       		ranked = sortByKey(articles2, 'sentimentRank');
