@@ -251,7 +251,7 @@ app.get('/alchemysentiment/', function(req, res) {
 				
 				articles2[i]={
 					popularityRank:i,
-					sentimentRank:json.docSentiment.score
+					sentimentRank:json.docSentiment.score*1000000
 				};
 				
 				
