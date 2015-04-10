@@ -10,6 +10,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var alchemyApi = require('alchemy-api');
 var alchemy = new alchemyApi('b57c92ce1fc89990843684e3ef445cba23c89b33');
+var fs =require('fs');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -208,8 +209,8 @@ app.get('/alchemysentiment/', function(req, res) {
 				console.log('Request was good');
 				var obj = JSON.parse(body);
 				//extractUrl(0,obj);
-				//webExtractText(0,obj);
-				webKeywordSentiment(0,obj);
+				webExtractText(0,obj);
+				//webKeywordSentiment(0,obj);
 			}
 			else
 			{
@@ -237,9 +238,6 @@ app.get('/alchemysentiment/', function(req, res) {
 		request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetTextSentiment?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&url=' + obj.results[i].url, jar: true}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				console.log('Request was good');
-			/*	var temp = JSON.parse(body);
-				var feeling =JSON.
-				console.log(feeling);*/
 				res.end(body);
 			}
 			else
@@ -257,9 +255,6 @@ app.get('/alchemysentiment/', function(req, res) {
 		request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&keywordExtractMode=strict&sentiment=1&url=' + obj.results[i].url, jar: true}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				console.log('Request was good');
-			/*	var temp = JSON.parse(body);
-				var feeling =JSON.
-				console.log(feeling);*/
 				res.end(body);
 			}
 			else
@@ -271,6 +266,20 @@ app.get('/alchemysentiment/', function(req, res) {
 		
 	};
 	
+});
+
+app.get('/alchemyOnCrawled/', function(req, res) {
+
+	fs.readFile('Request_Responses/22-03-2015/1Dviewed.txt','utf8',function(err,data){
+		if(err){
+			console.log('Not read');
+			throw err;
+		}
+		else{
+			console.log('File read');
+			res.end(data);
+		}
+	});
 });
 
 // catch 404 and forward to error handler
