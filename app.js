@@ -177,7 +177,33 @@ var webExtractText = function(i,results){
     		ranked = sortByKey(articles2, 'sentimentRank');
 		    for(var a in ranked) table+= "<tr><td>"+ranked[a].popularityRank+"</td><td>"+a+"</td><td>"+ranked[a].sentimentRank+"</td><td>"+results[ranked[a].popularityRank].url+"</td></tr>";
 		    table += "</table>";
-		    RES.send(table);
+		    
+		    
+		    var x = [], y = [];
+		    for(var a in ranked){
+		      x.push(ranked[a].popularityRank);
+		      y.push(ranked[a].sentimentRank);
+		    }
+		    
+		    /*
+		    RES.send('<style>'
+        +'text {'
+            +'font: 12px sans-serif;'
+        +'}'
+        +'svg {'
+            +'display: block;'
+        +'}'
+        +'html, body, #chart1, svg {'
+            +'margin: 0px;'
+            +'padding: 0px;'
+            +'height: 100%;'
+            +'width: 100%;'
+        +'}'
+    +'</style><div id="chart1"></div>'
+    +table+'<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js" charset="utf-8"></script>'
+    +'<script src="http://nvd3.org/assets/js/nv.d3.js"></script><script>var x='+JSON.stringify(x)+',y='+JSON.stringify(y)+';');
+    */
+    RES.send(table);
 	    }
 	    //res.end(body);
 	  }
@@ -197,6 +223,7 @@ app.get('/alchemy/:offset', function(req, res) {
   RES = res;
   RESULTS = [];
   ALCHEMY_STOP = false;
+  articles2 = [];
   
 
 	var functionstring = 'mostPop(0,';
