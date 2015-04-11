@@ -3,7 +3,7 @@
 Launch (node command prompt):
 set DEBUG=myapp & node ./bin/www
 
-Test (web browser):
+Test (web browser): last number represents the amount of entries to be shown
 
 Sentiment library (dic)
 - http://localhost:3000/sentiment/20
