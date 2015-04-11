@@ -11,6 +11,10 @@ var bodyParser = require('body-parser');
 var alchemyApi = require('alchemy-api');
 var alchemy = new alchemyApi('b57c92ce1fc89990843684e3ef445cba23c89b33');
 var fs =require('fs');
+var sklearn = require('scikit-learn');
+var inspect = require('inspect-stream');
+var arrayify = require('arrayify-merge.s');
+var slice = require('slice-flow.s');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -173,7 +177,7 @@ app.get('/sentiment/:apiPath', function(req, res) {
 	// Rank a list of articles according to the sentiment analysis
 	var rankBySentiment = function(obj, articles) {
 		var ranked = [];
-		var table = "<table border=1><tr><td>Popularity rank</td><td>Sentiment rank</td><td>Article URL</td></tr>";
+		var table = "<table border=1><tr><td>Popularity rank</td><td>Sentiment rank</td><td>Sentiment score</td><td>Article URL</td></tr>";
 		for(var i in articles){
 			sentiment(articles[i], function (err, result) {
 			
@@ -189,7 +193,7 @@ app.get('/sentiment/:apiPath', function(req, res) {
 				
 				if(i ==	articles.length-1){
 					ranked = sortByKey(articles, 'sentimentRank');
-					for(var a in ranked) table+= "<tr><td>"+ranked[a].popularityRank+"</td><td>"+a+"</td><td>"+obj.results[ranked[a].popularityRank].url+"</td></tr>";
+					for(var a in ranked) table+= "<tr><td>"+ranked[a].popularityRank+"</td><td>"+a+"</td><td>"+ranked[a].sentimentRank+"</td><td>"+obj.results[ranked[a].popularityRank].url+"</td></tr>";
 					table += "</table>";
 					res.send(table);
 				}
@@ -200,7 +204,14 @@ app.get('/sentiment/:apiPath', function(req, res) {
 	apiReq.end();
 });
 
-
+var articles2 = [];
+var clf;
+function sortByKey(array, key) {
+	    return array.sort(function(a, b) {
+		var x = a[key], y = b[key];
+		return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+	    });
+	}
 app.get('/alchemysentiment/', function(req, res) {
 
 	// GET most viewed articles in JSON format from NYT API
@@ -209,7 +220,7 @@ app.get('/alchemysentiment/', function(req, res) {
 				console.log('Request was good');
 				var obj = JSON.parse(body);
 				//extractUrl(0,obj);
-				webExtractText(0,obj);
+				for(var i in obj.results) webExtractText(i,obj);
 				//webKeywordSentiment(0,obj);
 			}
 			else
@@ -238,7 +249,30 @@ app.get('/alchemysentiment/', function(req, res) {
 		request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetTextSentiment?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&url=' + obj.results[i].url, jar: true}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				console.log('Request was good');
-				res.end(body);
+
+			/*	var temp = JSON.parse(body);
+				var feeling =JSON.
+				console.log(feeling);*/
+				var json = JSON.parse(body);
+				//alscores[i] = json.docSentiment.score;
+				
+				articles2[i]={
+					popularityRank:i,
+					sentimentRank:json.docSentiment.score*1000000,
+					url:obj.results[i].url
+				};
+				
+				
+				
+				if(articles2.length == obj.results.length){
+				  var ranked = [];
+      		var table = "<table border=1><tr><td>Popularity rank</td><td>Alchemy rank</td><td>Alchemy score</td><td>Article URL</td></tr>";
+      		ranked = sortByKey(articles2, 'sentimentRank');
+					for(var a in ranked) table+= "<tr><td>"+ranked[a].popularityRank+"</td><td>"+a+"</td><td>"+ranked[a].sentimentRank+"</td><td>"+obj.results[ranked[a].popularityRank].url+"</td></tr>";
+					table += "</table>";
+					res.send(table);
+				}
+				//res.end(body);
 			}
 			else
 			{
@@ -281,6 +315,11 @@ app.get('/alchemyOnCrawled/', function(req, res) {
 		}
 	});
 });
+
+var modelCreation = function(Articles){
+	console.log('Creation of file');
+	var file = fs.open('C:/Users/Lucas/GTA/Internet and Network App/NYT_Sentiment/text.txt',w);
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
