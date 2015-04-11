@@ -17,6 +17,7 @@
     "inspect-stream": "^0.1.0",
     "jade": "~1.9.2",
     "morgan": "~1.5.1",
+    "readable-stream": "^1.0.33",
     "request": "*",
     "scikit-learn": "^0.1.0",
     "sentiment": "0.2.1",

@@ -284,6 +284,8 @@ app.get('/alchemysentiment/', function(req, res) {
       		ranked = sortByKey(articles2, 'sentimentRank');
 					for(var a in ranked) table+= "<tr><td>"+ranked[a].popularityRank+"</td><td>"+a+"</td><td>"+ranked[a].sentimentRank+"</td><td>"+obj.results[ranked[a].popularityRank].url+"</td></tr>";
 					table += "</table>";
+					console.log('We go trough here');
+					modelCreation(articles2);
 					res.send(table);
 				}
 				//res.end(body);
@@ -332,7 +334,8 @@ app.get('/alchemyOnCrawled/', function(req, res) {
 
 var modelCreation = function(Articles){
 	console.log('Creation of file');
-	var file = fs.open('C:/Users/Lucas/GTA/Internet and Network App/NYT_Sentiment/text.txt',w);
+	var file = fs.openSync('C:/Users/Lucas/GTA/Internet and Network App/NYT_Sentiment/text.txt',w);
+	fs.writeSync(file,"Ceci est un test");
 }
 
 // catch 404 and forward to error handler
