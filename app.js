@@ -10,6 +10,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var alchemyApi = require('alchemy-api');
 var alchemy = new alchemyApi('b57c92ce1fc89990843684e3ef445cba23c89b33');
+var fs =require('fs');
+var sklearn = require('scikit-learn');
+var inspect = require('inspect-stream');
+var arrayify = require('arrayify-merge.s');
+var slice = require('slice-flow.s');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -239,6 +244,7 @@ app.get('/alchemy/:offset', function(req, res) {
 });
 
 var articles2 = [];
+var clf;
 
 app.get('/alchemysentiment/', function(req, res) {
 
@@ -277,6 +283,7 @@ app.get('/alchemysentiment/', function(req, res) {
 		request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetTextSentiment?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&url=' + obj.results[i].url, jar: true}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				console.log('Request was good');
+
 			/*	var temp = JSON.parse(body);
 				var feeling =JSON.
 				console.log(feeling);*/
@@ -286,12 +293,14 @@ app.get('/alchemysentiment/', function(req, res) {
 				if(json.docSentiment)
   				articles2[i]={
   					popularityRank:i,
-  					sentimentRank:json.docSentiment.score*1000000
+  					sentimentRank:json.docSentiment.score*1000000,
+					url:obj.results[i].url
   				};
   			else
   		  	articles2[i]={
   					popularityRank:0,
-  					sentimentRank:0
+  					sentimentRank:0,
+					url:null
   				};
 				
 				
@@ -321,9 +330,6 @@ app.get('/alchemysentiment/', function(req, res) {
 		request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&keywordExtractMode=strict&sentiment=1&url=' + obj.results[i].url, jar: true}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				console.log('Request was good');
-			/*	var temp = JSON.parse(body);
-				var feeling =JSON.
-				console.log(feeling);*/
 				res.end(body);
 			}
 			else
@@ -336,6 +342,25 @@ app.get('/alchemysentiment/', function(req, res) {
 	};
 	
 });
+
+app.get('/alchemyOnCrawled/', function(req, res) {
+
+	fs.readFile('Request_Responses/22-03-2015/1Dviewed.txt','utf8',function(err,data){
+		if(err){
+			console.log('Not read');
+			throw err;
+		}
+		else{
+			console.log('File read');
+			res.end(data);
+		}
+	});
+});
+
+var modelCreation = function(Articles){
+	console.log('Creation of file');
+	var file = fs.open('C:/Users/Lucas/GTA/Internet and Network App/NYT_Sentiment/text.txt',w);
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
