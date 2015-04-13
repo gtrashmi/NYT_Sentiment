@@ -152,7 +152,8 @@ app.get('/sentiment/:offset', function(req, res) {
 	
 });
 
-var webExtractText = function(i,results){
+var webExtractText = function(i,results,filename){
+	if(typeof filename ==undefined) filename = 'test.txt';
   request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetTextSentiment?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&url=' + results[i].url, jar: true}, function (error, response, body) {
 	  if (!error && response.statusCode == 200) {
 	    console.log('Request '+articles2.length+'/'+results.length+' OK');
@@ -165,12 +166,14 @@ var webExtractText = function(i,results){
 	    if(json.docSentiment)
 		    articles2[i]={
 			    popularityRank:i,
-			    sentimentRank:json.docSentiment.score*1000000
+			    sentimentRank:json.docSentiment.score*1000000,
+				url: results[i].url
 		    };
 	    else
       	articles2[i]={
 			    popularityRank:0,
-			    sentimentRank:0
+			    sentimentRank:0,
+				url: ''
 		    };
 	
 
@@ -208,6 +211,8 @@ var webExtractText = function(i,results){
     +table+'<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js" charset="utf-8"></script>'
     +'<script src="http://nvd3.org/assets/js/nv.d3.js"></script><script>var x='+JSON.stringify(x)+',y='+JSON.stringify(y)+';');
     */
+	console.log('Just before the file creation');
+	//modelCreation(articles2,'filename');
     RES.send(table);
 	    }
 	    //res.end(body);
@@ -345,8 +350,14 @@ app.get('/alchemysentiment/', function(req, res) {
 	
 });
 
-app.get('/alchemyOnCrawled/', function(req, res) {
+app.get('/alchemyOnCrawled/:folder', function(req, res) {
 
+	var folder = req.params.folder;
+	console.log(typeof folder);
+	console.log(folder);
+	ALCHEMY_STOP = false;
+	RES = res;
+	articles2 = [];
 	fs.readFile('Request_Responses/22-03-2015/1Dviewed.txt','utf8',function(err,data){
 		if(err){
 			console.log('Not read');
@@ -354,15 +365,23 @@ app.get('/alchemyOnCrawled/', function(req, res) {
 		}
 		else{
 			console.log('File read');
-			res.end(data);
+			//console.log(typeof data);
+			var popularList = JSON.parse(data);
+			for(var i in popularList.results) webExtractText(i,popularList.results,'try.txt');
+			//modelCreation(articles2,'try.txt');
+			//res.end(data);
 		}
 	});
 });
 
-var modelCreation = function(Articles){
+var modelCreation = function(Articles, filename){
 	console.log('Creation of file');
-	var file = fs.openSync('C:/Users/Lucas/GTA/Internet and Network App/NYT_Sentiment/text.txt',w);
-	fs.writeSync(file,"Ceci est un test");
+	var file = fs.openSync('C:/Users/Lucas/GTA/Internet and Network App/NYT_Sentiment/'+ filename,'w');
+	var data ="";
+	for(var i =0; i < (Articles.length-1);i++){
+		data = data + Articles[i].popularityRank + " " + Articles[i].sentimentRank + " " + Articles[i].url +  "\r\n";
+	}
+	fs.writeSync(file,data);
 }
 
 // catch 404 and forward to error handler
