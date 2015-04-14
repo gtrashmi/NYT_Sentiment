@@ -217,7 +217,7 @@ var webExtractText = function(i,results,filename){
     +'<script src="http://nvd3.org/assets/js/nv.d3.js"></script><script>var x='+JSON.stringify(x)+',y='+JSON.stringify(y)+';');
     */
 	console.log('Just before the file creation');
-	//modelCreation(articles2,'filename');
+	modelCreation(articles2,filename);
     RES.send(table);
 	    }
 	    //res.end(body);
@@ -363,7 +363,7 @@ app.get('/alchemyOnCrawled/:folder', function(req, res) {
 	ALCHEMY_STOP = false;
 	RES = res;
 	articles2 = [];
-	fs.readFile('Request_Responses/22-03-2015/1Dviewed.txt','utf8',function(err,data){
+	fs.readFile('Request_Responses/'+ folder +'/1Dviewed.txt','utf8',function(err,data){
 		if(err){
 			console.log('Not read');
 			throw err;
@@ -372,7 +372,7 @@ app.get('/alchemyOnCrawled/:folder', function(req, res) {
 			console.log('File read');
 			//console.log(typeof data);
 			var popularList = JSON.parse(data);
-			webExtractText(0,popularList.results,'try.txt');
+			webExtractText(0,popularList.results, folder + '.txt');
 			//modelCreation(articles2,'try.txt');
 			//res.end(data);
 		}
@@ -381,7 +381,8 @@ app.get('/alchemyOnCrawled/:folder', function(req, res) {
 
 var modelCreation = function(Articles, filename){
 	console.log('Creation of file');
-	var file = fs.openSync('C:/Users/Lucas/GTA/Internet and Network App/NYT_Sentiment/'+ filename,'w');
+	var file = fs.openSync(filename,'w');
+	console.log(Articles.length.toString());
 	var data ="";
 	for(var i =0; i < (Articles.length-1);i++){
 		data = data + Articles[i].popularityRank + " " + Articles[i].sentimentRank + " " + Articles[i].url +  "\r\n";
