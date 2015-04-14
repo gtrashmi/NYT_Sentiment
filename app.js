@@ -153,7 +153,12 @@ app.get('/sentiment/:offset', function(req, res) {
 });
 
 var webExtractText = function(i,results,filename){
-	if(typeof filename ==undefined) filename = 'test.txt';
+  var recursive = false;
+  if(filename) recursive = true;
+	if(typeof filename ==undefined){
+	  filename = 'test.txt';
+	  recursive = true;
+	}
   request({method: 'GET', uri: 'http://access.alchemyapi.com/calls/url/URLGetTextSentiment?apikey=b57c92ce1fc89990843684e3ef445cba23c89b33&outputMode=json&url=' + results[i].url, jar: true}, function (error, response, body) {
 	  if (!error && response.statusCode == 200) {
 	    console.log('Request '+articles2.length+'/'+results.length+' OK');
@@ -177,8 +182,8 @@ var webExtractText = function(i,results,filename){
 		    };
 	
 
-	
-	    if(articles2.length == results.length && !ALCHEMY_STOP){
+	    if(recursive && i != results.length-1) webExtractText(i+1,results,filename);
+	    else if(recursive || (articles2.length == results.length && !ALCHEMY_STOP)){
 	      ALCHEMY_STOP = true;
 	      var ranked = [];
     		var table = "<table border=1><tr><td>Popularity rank</td><td>Alchemy rank</td><td>Alchemy score</td><td>Article URL</td></tr>";
@@ -367,7 +372,7 @@ app.get('/alchemyOnCrawled/:folder', function(req, res) {
 			console.log('File read');
 			//console.log(typeof data);
 			var popularList = JSON.parse(data);
-			for(var i in popularList.results) webExtractText(i,popularList.results,'try.txt');
+			webExtractText(0,popularList.results,'try.txt');
 			//modelCreation(articles2,'try.txt');
 			//res.end(data);
 		}
