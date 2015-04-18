@@ -1,0 +1,19 @@
+5 -533120 http://www.nytimes.com/2015/04/04/world/europe/germanwings-crash.html
+7 -487340 http://www.nytimes.com/2015/04/03/world/africa/garissa-university-college-shooting-in-kenya.html
+8 -321674 http://www.nytimes.com/politics/first-draft/2015/04/03/rand-paul-has-j-c-watts-in-his-corner/
+0 -299314 http://www.nytimes.com/2015/04/04/sports/the-last-man-to-beat-floyd-mayweather-jr-still-regrets-it.html
+16 -289000 http://www.nytimes.com/2015/04/04/us/colorado-furor-erupts-over-charges-filed-and-not-filed-in-grisly-attack-on-pregnant-woman.html
+1 -279616 http://www.nytimes.com/2015/04/03/world/middleeast/a-foreign-policy-gamble-by-obama-at-a-moment-of-truth.html
+18 -271168 http://www.nytimes.com/2015/04/03/opinion/a-promising-nuclear-deal-with-iran.html
+3 -238519 http://www.nytimes.com/2015/04/03/world/middleeast/iran-nuclear-talks.html
+11 -235807 http://www.nytimes.com/2015/04/03/opinion/david-brooks-on-conquering-fear.html
+2 -180227 http://www.nytimes.com/2015/04/03/world/europe/germanwings-lufthansa-andreas-lubitz-black-box.html
+19 -176895 http://www.nytimes.com/2015/04/02/us/california-imposes-first-ever-water-restrictions-to-deal-with-drought.html
+17 -118502 http://www.nytimes.com/2015/04/05/opinion/sunday/frank-bruni-same-sex-sinners.html
+4 -102369 http://www.nytimes.com/2015/04/03/opinion/paul-krugman-power-and-paychecks.html
+9 -59669.100000000006 http://www.nytimes.com/2015/04/03/sports/olympics/boston-2024-olympic-bid-is-a-problem-of-usocs-own-making.html
+12 -58318.1 http://www.nytimes.com/2015/04/05/magazine/the-many-faces-of-tatiana-maslany.html
+13 -10869.699999999999 http://www.nytimes.com/interactive/2015/04/03/arts/television/mad-men-season-7-timeline.html
+0 0 
+0 0 
+0 0 

@@ -379,6 +379,7 @@ app.get('/alchemyOnCrawled/:folder', function(req, res) {
 	});
 });
 
+
 var modelCreation = function(Articles, filename){
 	console.log('Creation of file');
 	var file = fs.openSync(filename,'w');
