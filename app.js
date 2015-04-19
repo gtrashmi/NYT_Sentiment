@@ -111,7 +111,7 @@ function sortByKey(array, key) {
 }
 	
 // Rank a list of articles according to the sentiment analysis
-var rankBySentiment = function(results, articles, forward) {
+var rankBySentiment = function(results, articles,forward) {
 	var ranked = [];
 	var table = "<table border=1><tr><td>Popularity rank</td><td>Sentiment rank</td><td>Sentiment score</td><td>Article URL</td></tr>";
 	for(var i in articles){
@@ -125,8 +125,17 @@ var rankBySentiment = function(results, articles, forward) {
 				//text:articles[i],
 				url: results[i].url,
 				popularityRank:i,
-				sentimentScore:result.score/words.length
+				sentimentScore:result.score/words.length,
 			};
+			
+			if(sentimentTitle)
+			{
+				sentiment(results[i].title,function(err,resultTitle) {
+					console.log(' Titre = '+ resultTitle.score);
+					articles[i].titleScore = resultTitle.score;
+				});
+			}
+			
 
 			if(i ==	articles.length-1 && !forward){
 				ranked = sortByKey(articles, 'sentimentScore');
@@ -266,7 +275,6 @@ app.get('/alchemy/:offset', function(req, res) {
 });
 
 var articles2 = [];
-var clf;
 
 app.get('/alchemysentiment/', function(req, res) {
 
@@ -366,7 +374,32 @@ app.get('/alchemyOnCrawled/:folder', function(req, res) {
 	alchemyOnCrawled(res, 'Request_Responses/'+ req.params.folder +'/1Dviewed.txt');
 });
 
-
+var sentimentTitle = false;
+app.get('/SentimentOnCrawled/:folder', function(req,res) {
+	console.log(req.params.folder);
+	
+	var poplist=[];
+	RES = res;
+	articles2 = 
+	sentimentTitle = true;
+	fs.readFile('Request_Responses/'+ req.params.folder +'/1Dviewed.txt','utf8',function(err,data){
+		if(err){
+			console.log('Not read');
+			throw err;
+		}
+		else{
+			var jsonList = JSON.parse(data);
+			extractContent(0, jsonList.results, poplist, function(poplist){
+				var file = fs.openSync('modeldata.txt','a');
+				var text = "";
+				for(i in poplist) {
+					text += poplist[i].popularityRank + " " + poplist[i].sentimentScore + " " + poplist[i].titleScore + "\r\n";
+				}
+				fs.writeSync(file,text);
+			});
+		}
+	});
+});
 var modelCreation = function(Articles, filename){
 	console.log('Creation of file');
 	var file = fs.openSync(filename,'w');
